@@ -131,50 +131,47 @@ def game_hash
   }
   
 end
-
-def num_points_scored(name)
- game_hash.each do |team,value1|
- value1.each do |attributes,value2|
-   if attributes == :players
-     value2.each do |player|
-       if player[:player_name] == name
-         return player[:points]
-     end
-   end
- end
- end
- end
+#extract all players data and store in an array, create an array of hashes
+def players
+players = []
+ game_hash.values.each { |team|
+ #each team players are already in an array, need to remove the []
+   team[:players].each{ |person|
+     players << person
+   }
+ }
+ players
+   
 end
 
+def num_points_scored(name)
+ player = players.find { |person|
+ person[:player_name] == name
+ }
+player[:points]
+end
+
+
 def shoe_size(name)
-game_hash.each do |team,value1|
- value1.each do |attributes,value2|
-   if attributes == :players
-     value2.each do |player|
-       if player[:player_name] == name
-         return player[:shoe]
-     end
-   end
- end
- end
- end
+player = players.find { |person|
+ person[:player_name] == name
+ }
+player[:shoe]
 end 
 
 def team_colors(name)
-  game_hash.each do |key,value|
-  if value[:team_name] == name
-    return value[:colors]
-    end
-  end
+ teamname = game_hash.values.find { |team|
+ team[:team_name] == name
+ }
+ 
+ teamname[:colors]
 end
 
 def team_names
-team_names = []
-game_hash.each {|key,value|
-  team_names.push(value[:team_name])
+teamnames = game_hash.values.map { |team|
+  team[:team_name]
 }
-
-team_names
+teamnames
 end
 
 def player_numbers(name)
@@ -196,21 +193,11 @@ end
 
 def player_stats(name)
 #define variable first
-stats={}
-game_hash.each{|key,value|
-  value.each {|key2,value2|
-    if key2 == :players
-      value2.each {|player|
-        if player[:player_name] == name
-        stats = player.delete_if{|k,v|
-        k == :player_name
-        }
-        end
-      }
-    end
-  }
+player = players.find{|person| 
+  person[:player_name] == name
 }
-stats
+  player.delete(:player_name)
+  player
 end
 
 def big_shoe_rebounds
@@ -236,7 +223,6 @@ def big_shoe_rebounds
   }
   rebounds
 end 
-
 def most_points_scored
   name = 0 
   most_points = 0
